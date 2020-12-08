@@ -47,17 +47,17 @@ public class Draw {
 
         // Угловой коэффициент AB
         double k_AB = (B.y-A.y)/(B.x-A.x);
-        // Свободный член
+//        // Свободный член
         double b_AB = A.y-((A.x*(B.y-A.y))/(B.x-A.x));
 
         // Угловой коэффициент DC
         double k_DC = (C.y-D.y)/(C.x-D.x);
-        // Свободный член
-        double b_DC = D.y-((D.x*(C.y-D.y))/(C.x-D.x));
+//        // Свободный член - хватит и одной линии, от которой отталкиваться при повороте
+//        double b_DC = D.y-((D.x*(C.y-D.y))/(C.x-D.x));
 
-        // Точка пересечения AB и DC
-        double point_AB_DC_x = (b_AB-b_DC)/(k_DC-k_AB);
-        Point point_AB_DC = new Point(point_AB_DC_x,k_AB*point_AB_DC_x+b_AB);
+//        // Точка пересечения AB и DC - а она и не нужна, лол
+//        double point_AB_DC_x = (b_AB-b_DC)/(k_DC-k_AB);
+//        Point point_AB_DC = new Point(point_AB_DC_x,k_AB*point_AB_DC_x+b_AB);
 
         // Тангенс угла между AB и DC
         double tg_AB_DC = (k_DC-k_AB)/(1+k_AB*k_DC);
@@ -76,18 +76,31 @@ public class Draw {
 
         // Угловой коэффициент BC
         double k_BC = (C.y-B.y)/(C.x-B.x);
-        // Свободный член
-        double b_BC = B.y-((B.x*(C.y-B.y))/(C.x-B.x));
+//        // Свободный член - хватит и одной линии, от которой отталкиваться при повороте
+//        double b_BC = B.y-((B.x*(C.y-B.y))/(C.x-B.x));
 
-        // Точка пересечения AD и BC
-        double point_AD_BC_x = (b_AD-b_BC)/(k_BC-k_AD);
-        Point point_AD_BC = new Point(point_AD_BC_x,k_AD*point_AD_BC_x+b_AD);
+//        // Точка пересечения AD и BC - а она и не нужна, лол
+//        double point_AD_BC_x = (b_AD-b_BC)/(k_BC-k_AD);
+//        Point point_AD_BC = new Point(point_AD_BC_x,k_AD*point_AD_BC_x+b_AD);
 
         // Тангенс угла между AD и BC
         double tg_AD_BC = (k_BC-k_AD)/(1+k_AD*k_BC);
 
         // Угол между AD и BC - используется для вычисления угла, равного 1/horizontalNumber части данного (шага по горизонтали)
         double angle_AD_BC = Math.atan(tg_AD_BC);
+
+        // Угловой коэффициент и свободный член прямой, после поворота её на заданный угол
+        // Данный локальный класс позволяет динамически задавать конкретную прямую и угол каждый раз, когда это необходимо
+        class RotatedLine {
+            private final double k;
+            private final double b;
+
+            public RotatedLine(double k_BeforeRotation, double b, double angle) {
+                this.b = b;
+                double tg = Math.tan(angle);
+                this.k = (k_BeforeRotation+tg)/(1-k_BeforeRotation*tg);
+            }
+        }
 
         int widthLines = verticalNumber < 1? 0 : verticalNumber-1;
         int heightLines = horizontalNumber < 1? 0 : horizontalNumber-1;
