@@ -26,7 +26,7 @@ public class Main {
     public static void saveCross(Mat image, Quadrangle testQuadrangle, int horizontalOrdinal, int verticalOrdinal, String path){
         Mat resImage = image.clone();
         // Color: BRG
-        resImage = Draw.polygonsCross(resImage, testQuadrangle, 20, 42, verticalOrdinal, horizontalOrdinal, new Scalar(255,255,255), new Scalar(0,255,255), 5);
+//        resImage = Draw.polygonsCross(resImage, testQuadrangle, 20, 42, verticalOrdinal, horizontalOrdinal, new Scalar(255,255,255), new Scalar(0,255,255), 5);
         saveImage(resImage, path);
     }
 
@@ -67,12 +67,18 @@ public class Main {
         verticalObjectImage = verticalObjectImageSource.clone();
 
         // Vertical correct
-        saveCross(verticalObjectImage, verticalObject, 21, 10,"./src/main/resources/img/examples/vertical/vertical_polygons-20-42_cross-0.jpg");
+//        saveCross(verticalObjectImage, verticalObject, 21, 10,"./src/main/resources/img/examples/vertical/vertical_polygons-20-42_cross-0.jpg");
 
         verticalObjectImage = Draw.contour(verticalObjectImage, verticalObject, new Scalar(255,0,77), 5);
         verticalObjectImage = Draw.polygons(verticalObjectImage, verticalObject, 2, new Scalar(255,255,255), 5, true);
 
         saveImage(verticalObjectImage, "./src/main/resources/img/examples/vertical/vertical_central-lines_2-correct.jpg");
+        verticalObjectImage = verticalObjectImageSource.clone();
+
+        verticalObjectImage = Draw.contour(verticalObjectImage, verticalObject, new Scalar(255,0,77), 5);
+        verticalObjectImage = Draw.polygons(verticalObjectImage, verticalObject, 20, 42, new Scalar(255,255,255), 5, true);
+
+        saveImage(verticalObjectImage, "./src/main/resources/img/examples/vertical/vertical_polygons_20-42-correct.jpg");
         verticalObjectImage = verticalObjectImageSource.clone();
 
 
@@ -90,12 +96,18 @@ public class Main {
         horizontalObjectImage = horizontalObjectImageSource.clone();
 
         // Horizontal correct
-        saveCross(verticalObjectImage, verticalObject, 21, 10,"./src/main/resources/img/examples/vertical/vertical_polygons-20-42_cross-0.jpg");
+//        saveCross(verticalObjectImage, verticalObject, 21, 10,"./src/main/resources/img/examples/vertical/vertical_polygons-20-42_cross-0.jpg");
 
         horizontalObjectImage = Draw.contour(horizontalObjectImage, horizontalObject, new Scalar(255,0,77), 5);
         horizontalObjectImage = Draw.polygons(horizontalObjectImage, horizontalObject, 2, new Scalar(255,255,255), 5, true);
 
         saveImage(horizontalObjectImage, "./src/main/resources/img/examples/horizontal/horizontal_central-lines_2-correct.jpg");
+        horizontalObjectImage = horizontalObjectImageSource.clone();
+
+        horizontalObjectImage = Draw.contour(horizontalObjectImage, horizontalObject, new Scalar(255,0,77), 5);
+        horizontalObjectImage = Draw.polygons(horizontalObjectImage, horizontalObject, 20, 42, new Scalar(255,255,255), 5, true);
+
+        saveImage(horizontalObjectImage, "./src/main/resources/img/examples/horizontal/horizontal_polygons_20-42-correct.jpg");
         horizontalObjectImage = horizontalObjectImageSource.clone();
     }
 }

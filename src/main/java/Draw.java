@@ -52,8 +52,8 @@ public class Draw {
 
         // Угловой коэффициент DC
         double k_DC = (C.y-D.y)/(C.x-D.x);
-//        // Свободный член - хватит и одной линии, от которой отталкиваться при повороте
-//        double b_DC = D.y-((D.x*(C.y-D.y))/(C.x-D.x));
+//        // Свободный член
+        double b_DC = D.y-((D.x*(C.y-D.y))/(C.x-D.x));
 
 //        // Точка пересечения AB и DC - а она и не нужна, лол
 //        double point_AB_DC_x = (b_AB-b_DC)/(k_DC-k_AB);
@@ -76,8 +76,8 @@ public class Draw {
 
         // Угловой коэффициент BC
         double k_BC = (C.y-B.y)/(C.x-B.x);
-//        // Свободный член - хватит и одной линии, от которой отталкиваться при повороте
-//        double b_BC = B.y-((B.x*(C.y-B.y))/(C.x-B.x));
+        // Свободный член
+        double b_BC = B.y-((B.x*(C.y-B.y))/(C.x-B.x));
 
 //        // Точка пересечения AD и BC - а она и не нужна, лол
 //        double point_AD_BC_x = (b_AD-b_BC)/(k_BC-k_AD);
@@ -102,31 +102,34 @@ public class Draw {
             }
         }
 
+        // Точка пересечения двух прямых
+        // Данный локальный класс позволяет динамически задавать конкретные коэффициенты обеих прямых
+        class LinesCrossing {
+            private final Point point;
+
+            public LinesCrossing(double k1, double b1, double k2, double b2) {
+                double point_x = (b1-b2)/(k2-k1);
+                this.point = new Point(point_x,k_AD*point_x+b_AD);
+            }
+        }
+
         int widthLines = verticalNumber < 1? 0 : verticalNumber-1;
         int heightLines = horizontalNumber < 1? 0 : horizontalNumber-1;
 
-//        for (int i = 1; i<=widthLines; i++){
-//            double l = (double)i/(widthLines-i+1);
-//            Imgproc.line(resImage,
-//                    new Point(
-//                            (quadrangle.getBottomLeft().x+(quadrangle.getTopLeft().x*l))/(1+l),
-//                            (quadrangle.getBottomLeft().y+(quadrangle.getTopLeft().y*l))/(1+l)),
-//                    new Point(
-//                            (quadrangle.getBottomRight().x+(quadrangle.getTopRight().x*l))/(1+l),
-//                            (quadrangle.getBottomRight().y+(quadrangle.getTopRight().y*l))/(1+l)),
-//                    color, thickness);
-//        }
-//        for (int i = 1; i<=heightLines; i++){
-//            double l = (double)i/(heightLines-i+1);
-//            Imgproc.line(resImage,
-//                    new Point(
-//                            (quadrangle.getTopLeft().x+(quadrangle.getTopRight().x*l))/(1+l),
-//                            (quadrangle.getTopLeft().y+(quadrangle.getTopRight().y*l))/(1+l)),
-//                    new Point(
-//                            (quadrangle.getBottomLeft().x+(quadrangle.getBottomRight().x*l))/(1+l),
-//                            (quadrangle.getBottomLeft().y+(quadrangle.getBottomRight().y*l))/(1+l)),
-//                    color, thickness);
-//        }
+        for (int i = 1; i<=widthLines; i++){
+            double angle = i*angle_AB_DC/verticalNumber;
+            RotatedLine rotatedLine = new RotatedLine(k_AB, b_AB, angle);
+            LinesCrossing crossingAD = new LinesCrossing(k_AD, b_AD, rotatedLine.k, rotatedLine.b);
+            LinesCrossing crossingBC = new LinesCrossing(k_BC, b_BC, rotatedLine.k, rotatedLine.b);
+            Imgproc.line(resImage, crossingBC.point, crossingAD.point, color, thickness);
+        }
+        for (int i = 1; i<=heightLines; i++){
+            double angle = i*angle_AD_BC/horizontalNumber;
+            RotatedLine rotatedLine = new RotatedLine(k_AD, b_AD, angle);
+            LinesCrossing crossingAB = new LinesCrossing(k_AB, b_AB, rotatedLine.k, rotatedLine.b);
+            LinesCrossing crossingDC = new LinesCrossing(k_DC, b_DC, rotatedLine.k, rotatedLine.b);
+            Imgproc.line(resImage, crossingAB.point, crossingDC.point, color, thickness);
+        }
 
         return resImage;
     }
@@ -141,55 +144,6 @@ public class Draw {
 
     public static Mat polygons(Mat image, Quadrangle quadrangle, int number, Scalar color, int thickness){
         return polygons(image, quadrangle, number, number, color, thickness, false);
-    }
-
-    // polygonsCross позволяют выделить пересечение двух линий на сетке polygons
-
-    public static Mat polygonsCross(Mat image, Quadrangle quadrangle, int verticalNumber, int horizontalNumber, int verticalOrdinal, int horizontalOrdinal, Scalar mainColor, Scalar crossColor, int mainThickness, int crossThickness, boolean noContour){
-        Mat resImage = image.clone();
-
-        if(!noContour){
-            contour(resImage, quadrangle, mainColor, mainThickness);
-        }
-        int widthLines = verticalNumber < 1? 0 : verticalNumber-1;
-        int heightLines = horizontalNumber < 1? 0 : horizontalNumber-1;
-
-        for (int i = 1; i<=widthLines; i++){
-            double l = (double)i/(widthLines-i+1);
-            Imgproc.line(resImage,
-                    new Point(
-                            (quadrangle.getBottomLeft().x+(quadrangle.getTopLeft().x*l))/(1+l),
-                            (quadrangle.getBottomLeft().y+(quadrangle.getTopLeft().y*l))/(1+l)),
-                    new Point(
-                            (quadrangle.getBottomRight().x+(quadrangle.getTopRight().x*l))/(1+l),
-                            (quadrangle.getBottomRight().y+(quadrangle.getTopRight().y*l))/(1+l)),
-                    i==verticalOrdinal?crossColor:mainColor, i==verticalOrdinal?crossThickness:mainThickness);
-        }
-        for (int i = 1; i<=heightLines; i++){
-            double l = (double)i/(heightLines-i+1);
-            Imgproc.line(resImage,
-                    new Point(
-                            (quadrangle.getTopLeft().x+(quadrangle.getTopRight().x*l))/(1+l),
-                            (quadrangle.getTopLeft().y+(quadrangle.getTopRight().y*l))/(1+l)),
-                    new Point(
-                            (quadrangle.getBottomLeft().x+(quadrangle.getBottomRight().x*l))/(1+l),
-                            (quadrangle.getBottomLeft().y+(quadrangle.getBottomRight().y*l))/(1+l)),
-                    i==horizontalOrdinal?crossColor:mainColor, i==horizontalOrdinal?crossThickness:mainThickness);
-        }
-
-        return resImage;
-    }
-
-    public static Mat polygonsCross(Mat image, Quadrangle quadrangle, int verticalNumber, int horizontalNumber, int verticalOrdinal, int horizontalOrdinal, Scalar mainColor, Scalar crossColor, int mainThickness, int crossThickness){
-        return polygonsCross(image, quadrangle, verticalNumber, horizontalNumber, verticalOrdinal, horizontalOrdinal, mainColor, crossColor, mainThickness, crossThickness, false);
-    }
-
-    public static Mat polygonsCross(Mat image, Quadrangle quadrangle, int verticalNumber, int horizontalNumber, int verticalOrdinal, int horizontalOrdinal, Scalar mainColor, Scalar crossColor, int mainThickness, boolean noContour){
-        return polygonsCross(image, quadrangle, verticalNumber, horizontalNumber, verticalOrdinal, horizontalOrdinal, mainColor, crossColor, mainThickness, mainThickness*3, noContour);
-    }
-
-    public static Mat polygonsCross(Mat image, Quadrangle quadrangle, int verticalNumber, int horizontalNumber, int verticalOrdinal, int horizontalOrdinal, Scalar mainColor, Scalar crossColor, int mainThickness){
-        return polygonsCross(image, quadrangle, verticalNumber, horizontalNumber, verticalOrdinal, horizontalOrdinal, mainColor, crossColor, mainThickness, mainThickness*3, false);
     }
 
 
